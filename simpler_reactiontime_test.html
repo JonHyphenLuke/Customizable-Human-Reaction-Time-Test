@@ -29,13 +29,17 @@
     <h1>Reaction Time Test</h1>
     <p>When you click <b>Start</b>, wait until the screen says <b>GO!</b>, then click as fast as you can.</p>
 
-  <div id="settings">
-    <label>Delay before "GO!": 
-      <input id="delay" type="number" min="1" step="1" value="3"> seconds
-    </label>
-    <br>
-    <button id="toggleBtn">Hide Settings</button>
-  </div>
+    <!-- Settings container -->
+    <div id="settings">
+      <label>Delay before "GO!": 
+        <input id="delay" type="number" min="1" step="1" value="3"> seconds
+      </label>
+    </div>
+
+    <!-- Toggle button OUTSIDE so it's always available -->
+    <div>
+      <button id="toggleBtn">Hide Settings</button>
+    </div>
 
     <button id="startBtn">Start</button>
     <div class="big" id="prompt">Press Start</div>
@@ -48,7 +52,7 @@
     const result = document.getElementById("result");
     const delayInput = document.getElementById("delay");
     const settings = document.getElementById("settings");
-    const hideBtn = document.getElementById("hideBtn");
+    const toggleBtn = document.getElementById("toggleBtn");
 
     let goTime = 0;
     let waiting = false;
@@ -58,6 +62,12 @@
       if (isNaN(delaySec) || delaySec <= 0) {
         alert("Enter a positive number of seconds.");
         return;
+      }
+
+      // Hide settings when starting
+      if (!settings.classList.contains("hidden")) {
+        settings.classList.add("hidden");
+        toggleBtn.textContent = "Show Settings";
       }
 
       prompt.textContent = "Wait for it...";
@@ -71,9 +81,12 @@
       }, delaySec * 1000);
     });
 
-    // User response
+    // User response (mouse click or space/enter)
     document.addEventListener("keydown", (e) => {
-      if (e.key === " " || e.key === "Enter") handleResponse();
+      if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        handleResponse();
+      }
     });
     document.addEventListener("click", handleResponse);
 
@@ -86,18 +99,18 @@
       goTime = 0;
     }
 
-    // Hide settings button
-  const toggleBtn = document.getElementById("toggleBtn");
+    // Toggle button
+    toggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // don’t let toggle click count as a response
 
-  toggleBtn.addEventListener("click", () => {
-    if (settings.classList.contains("hidden")) {
-      settings.classList.remove("hidden");
-      toggleBtn.textContent = "Hide Settings";
-    } else {
-      settings.classList.add("hidden");
-      toggleBtn.textContent = "Show Settings";
-    }
-  });
+      if (settings.classList.contains("hidden")) {
+        settings.classList.remove("hidden");
+        toggleBtn.textContent = "Hide Settings";
+      } else {
+        settings.classList.add("hidden");
+        toggleBtn.textContent = "Show Settings";
+      }
+    });
   </script>
 </body>
 </html>
