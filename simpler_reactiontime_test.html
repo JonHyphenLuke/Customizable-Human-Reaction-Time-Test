@@ -29,13 +29,13 @@
     <h1>Reaction Time Test</h1>
     <p>When you click <b>Start</b>, wait until the screen says <b>GO!</b>, then click as fast as you can.</p>
 
-<div id="settings">
-  <label>Delay before "GO!": 
-    <input id="delay" type="number" min="1" step="1" value="3"> seconds
-  </label>
-  <br>
-  <button id="toggleBtn">Hide Settings</button>
-</div>
+  <div id="settings">
+    <label>Delay before "GO!": 
+      <input id="delay" type="number" min="1" step="1" value="3"> seconds
+    </label>
+    <br>
+    <button id="toggleBtn">Hide Settings</button>
+  </div>
 
     <button id="startBtn">Start</button>
     <div class="big" id="prompt">Press Start</div>
@@ -87,17 +87,17 @@
     }
 
     // Hide settings button
-const toggleBtn = document.getElementById("toggleBtn");
+  const toggleBtn = document.getElementById("toggleBtn");
 
-toggleBtn.addEventListener("click", () => {
-  if (settings.classList.contains("hidden")) {
-    settings.classList.remove("hidden");
-    toggleBtn.textContent = "Hide Settings";
-  } else {
-    settings.classList.add("hidden");
-    toggleBtn.textContent = "Show Settings";
-  }
-});
+  toggleBtn.addEventListener("click", () => {
+    if (settings.classList.contains("hidden")) {
+      settings.classList.remove("hidden");
+      toggleBtn.textContent = "Hide Settings";
+    } else {
+      settings.classList.add("hidden");
+      toggleBtn.textContent = "Show Settings";
+    }
+  });
   </script>
 </body>
 </html>
