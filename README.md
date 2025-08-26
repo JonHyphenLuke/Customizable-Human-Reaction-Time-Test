@@ -1,1 +1,1 @@
-This project has a custumizable "Human Reaction time Benchmark test" where you can set the amount to second before it prompts you to click on the screen
+This project has a custumizable "Human Reaction time Benchmark test" where you can set the amount to second before it prompts you to click on the screen. You can also hide what value you have the timer set to, to get back to the "settings" page reload the page
