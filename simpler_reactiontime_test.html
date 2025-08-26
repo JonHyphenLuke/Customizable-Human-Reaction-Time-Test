@@ -15,23 +15,28 @@
       background: #111a33; border-radius: 14px;
     }
     button {
-      margin-top: 20px; padding: 12px 20px;
+      margin-top: 12px; padding: 10px 16px;
       font-size: 16px; border: none; border-radius: 10px;
       background: #62f; color: white; cursor: pointer;
     }
     button:disabled { background: #555; }
     .big { font-size: 32px; font-weight: bold; margin: 30px 0; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="box">
     <h1>Reaction Time Test</h1>
-    <p>Set the delay (in seconds). When you click <b>Start</b>, wait until the screen says <b>GO!</b>, then click as fast as you can.</p>
+    <p>When you click <b>Start</b>, wait until the screen says <b>GO!</b>, then click as fast as you can.</p>
 
-    <label>Delay before "GO!": 
-      <input id="delay" type="number" min="1" step="1" value="3"> seconds
-    </label>
-    <br>
+    <div id="settings">
+      <label>Delay before "GO!": 
+        <input id="delay" type="number" min="1" step="1" value="3"> seconds
+      </label>
+      <br>
+      <button id="hideBtn">Hide Settings</button>
+    </div>
+
     <button id="startBtn">Start</button>
     <div class="big" id="prompt">Press Start</div>
     <div id="result"></div>
@@ -42,6 +47,8 @@
     const prompt = document.getElementById("prompt");
     const result = document.getElementById("result");
     const delayInput = document.getElementById("delay");
+    const settings = document.getElementById("settings");
+    const hideBtn = document.getElementById("hideBtn");
 
     let goTime = 0;
     let waiting = false;
@@ -64,7 +71,7 @@
       }, delaySec * 1000);
     });
 
-    // User response by clicking anywhere or pressing space/enter
+    // User response
     document.addEventListener("keydown", (e) => {
       if (e.key === " " || e.key === "Enter") handleResponse();
     });
@@ -74,11 +81,15 @@
       if (!waiting || !goTime) return;
       const rt = performance.now() - goTime;
       prompt.textContent = `Your reaction time: ${Math.round(rt)} ms`;
-      result.textContent = "";
       startBtn.disabled = false;
       waiting = false;
       goTime = 0;
     }
+
+    // Hide settings button
+    hideBtn.addEventListener("click", () => {
+      settings.classList.add("hidden");
+    });
   </script>
 </body>
 </html>
