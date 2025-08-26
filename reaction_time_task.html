@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Reaction Time Task — Foreperiod IV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0b1020; --card:#111a33; --ink:#e6ecff; --muted:#9fb2ff; --accent:#62f; }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    body { margin:0; background:linear-gradient(180deg,#0b1020,#0b1020 60%,#0e1530); color:var(--ink); }
+    .wrap { max-width: 920px; margin: 32px auto; padding: 0 16px; }
+    .card { background: var(--card); border:1px solid rgba(255,255,255,.06); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: .2px; }
+    p { color: var(--muted); margin: 0 0 14px; }
+    .grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:14px; }
+    label { display:block; font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+    input, select { width:100%; padding:10px 12px; background:#0d142a; color:var(--ink); border:1px solid rgba(255,255,255,.08); border-radius:12px; outline:none; }
+    input[type="number"] { -moz-appearance: textfield; }
+    .row { display:flex; gap:10px; flex-wrap: wrap; align-items: center; }
+    .btn { appearance: none; border:0; padding:12px 16px; background: var(--accent); color:white; border-radius: 14px; font-weight: 700; cursor: pointer; transition: transform .05s ease; }
+    .btn.secondary { background:#1b2750; color: var(--ink); }
+    .btn:active { transform: translateY(1px); }
+    .pill { padding:6px 10px; background:#1b2750; border-radius:999px; font-size:12px; color:var(--muted); }
+    .stage { margin-top:20px; height: 280px; border-radius: 16px; background:#0a0f22; border:1px dashed rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; font-size:22px; }
+    .cue, .go { font-size: 40px; font-weight: 800; letter-spacing: .5px; }
+    .cue { color: #ffc14d; }
+    .go { color: #6bff8d; }
+    .warn { color:#ff8e8e; }
+    .good { color:#6bff8d; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    .footer { margin-top: 16px; display:flex; gap:10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .small { font-size: 12px; color: var(--muted); }
+    .hidden { display:none !important; }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Reaction Time Task</h1>
+      <p>Measure simple RT to a visual “GO” signal. The independent variable (IV) is the <b>foreperiod</b> (delay before the GO prompt). Configure a fixed delay or a random range, then run multiple trials. Responses via mouse click or <span class="mono">Space</span>/<span class="mono">Enter</span>.</p>
+
+      <div class="grid">
+        <div>
+          <label>Participant ID</label>
+          <input id="pid" placeholder="e.g., P001" />
+        </div>
+        <div>
+          <label>Number of trials</label>
+          <input id="trials" type="number" min="1" step="1" value="20" />
+        </div>
+        <div>
+          <label>Foreperiod mode (IV)</label>
+          <select id="fpMode">
+            <option value="fixed">Fixed (ms)</option>
+            <option value="random">Random range (ms)</option>
+          </select>
+        </div>
+        <div>
+          <label>Fixed foreperiod (ms)</label>
+          <input id="fpFixed" type="number" min="0" step="10" value="1000" />
+        </div>
+        <div>
+          <label>Random foreperiod min (ms)</label>
+          <input id="fpMin" type="number" min="0" step="10" value="500" />
+        </div>
+        <div>
+          <label>Random foreperiod max (ms)</label>
+          <input id="fpMax" type="number" min="0" step="10" value="2000" />
+        </div>
+        <div>
+          <label>Inter-trial interval (ms)</label>
+          <input id="iti" type="number" min="0" step="10" value="800" />
+        </div>
+        <div>
+          <label>Trials to discard as practice</label>
+          <input id="practice" type="number" min="0" step="1" value="2" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <label><input id="fullscreen" type="checkbox" /> Force fullscreen</label>
+        <label><input id="auditory" type="checkbox" /> Add “beep” with GO</label>
+        <span class="pill">Click, Space, or Enter to respond</span>
+      </div>
+
+      <div class="row" style="margin-top:16px;">
+        <button class="btn" id="startBtn">Start</button>
+        <button class="btn secondary" id="stopBtn" disabled>Stop</button>
+        <button class="btn secondary" id="downloadBtn" disabled>Download CSV</button>
+      </div>
+
+      <div class="stage" id="stage" role="button" tabindex="0" aria-label="Reaction stage">
+        <div id="prompt">Press <span class="mono">Enter</span> to start</div>
+      </div>
+
+      <div class="footer">
+        <div class="small" id="status">Ready.</div>
+        <div class="small">Premature = response before GO.</div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="beep" class="hidden">
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAAA" type="audio/wav">
+  </audio>
+
+  <script>
+    // --- State ---
+    const el = (id) => document.getElementById(id);
+    const pid = el('pid'), trialsIn = el('trials'), fpMode = el('fpMode'),
+          fpFixed = el('fpFixed'), fpMin = el('fpMin'), fpMax = el('fpMax'),
+          itiIn = el('iti'), practiceIn = el('practice'),
+          startBtn = el('startBtn'), stopBtn = el('stopBtn'),
+          downloadBtn = el('downloadBtn'), stage = el('stage'),
+          prompt = el('prompt'), status = el('status'),
+          beep = el('beep'), fullscreen = el('fullscreen'), auditory = el('auditory');
+
+    let running = false, awaitingGo = false, goShownAt = 0, currentTrial = 0,
+        totalTrials = 0, iti = 800, practice = 0, timer = null, results = [];
+
+    const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+    function getForeperiod() {
+      if (fpMode.value === 'fixed') {
+        return Math.max(0, Number(fpFixed.value||0));
+      }
+      const lo = Math.max(0, Number(fpMin.value||0));
+      const hi = Math.max(lo, Number(fpMax.value||0));
+      return randInt(lo, hi);
+    }
+
+    function setStatus(msg) { status.textContent = msg; }
+
+    async function goFullscreenIfNeeded() {
+      if (!fullscreen.checked) return;
+      try {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      } catch (e) { /* ignore */ }
+    }
+
+    function endFullscreenIfNeeded() {
+      if (!fullscreen.checked) return;
+      if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    }
+
+    function resetUI() {
+      running = false; awaitingGo = false; goShownAt = 0; currentTrial = 0;
+      clearTimeout(timer); timer = null;
+      prompt.innerHTML = 'Press <span class="mono">Enter</span> to start';
+      prompt.className = '';
+      startBtn.disabled = false; stopBtn.disabled = true; downloadBtn.disabled = results.length===0;
+      stage.focus();
+      setStatus('Ready.');
+      endFullscreenIfNeeded();
+    }
+
+    function prepareTrial() {
+      if (!running) return;
+      currentTrial++;
+      if (currentTrial > totalTrials) { finish(); return; }
+      prompt.textContent = 'Get ready...';
+      prompt.className = '';
+      setStatus(`Trial ${currentTrial}/${totalTrials}: waiting foreperiod`);
+      const foreperiod = getForeperiod();
+      awaitingGo = true;
+      timer = setTimeout(() => {
+        showGo(foreperiod);
+      }, foreperiod);
+    }
+
+    function showGo(foreperiod) {
+      if (!running) return;
+      prompt.textContent = 'GO!';
+      prompt.className = 'go';
+      goShownAt = performance.now();
+      if (auditory.checked) { try { beep.currentTime = 0; beep.play().catch(()=>{}); } catch(e){} }
+      // If no response within 3 seconds, record as miss and move on
+      timer = setTimeout(() => {
+        recordResult({rt: null, premature: false, foreperiod});
+        nextTrial();
+      }, 3000);
+    }
+
+    function recordResult({rt, premature, foreperiod}) {
+      const row = {
+        participant_id: (pid.value||'NA').trim(),
+        trial: currentTrial,
+        practice: currentTrial <= practice ? 1 : 0,
+        foreperiod_ms: foreperiod,
+        rt_ms: rt===null ? '' : Math.round(rt),
+        premature: premature ? 1 : 0,
+        timestamp_iso: new Date().toISOString(),
+        mode: fpMode.value
+      };
+      results.push(row);
+    }
+
+    function nextTrial() {
+      clearTimeout(timer); timer = null; awaitingGo = false; goShownAt = 0;
+      prompt.textContent = '…';
+      prompt.className = '';
+      setStatus(`Inter-trial interval (${iti} ms)`);
+      timer = setTimeout(() => { prepareTrial(); }, iti);
+    }
+
+    function finish() {
+      running = false; awaitingGo = false;
+      clearTimeout(timer); timer = null;
+      startBtn.disabled = false; stopBtn.disabled = true; downloadBtn.disabled = results.length===0;
+      prompt.innerHTML = 'Done! Click <b>Download CSV</b> to save data.';
+      prompt.className = 'good';
+      setStatus(`Finished ${totalTrials} trials.`);
+      endFullscreenIfNeeded();
+    }
+
+    function handleResponse() {
+      if (!running) return;
+      const now = performance.now();
+      // Premature response
+      if (awaitingGo && !goShownAt) {
+        clearTimeout(timer); timer = null;
+        prompt.textContent = 'Too soon!';
+        prompt.className = 'warn';
+        setStatus('Premature response recorded.');
+        recordResult({rt: null, premature: true, foreperiod: getForeperiod()}); // store planned FP approx.
+        // small penalty before next trial
+        timer = setTimeout(nextTrial, 800);
+        return;
+      }
+      // Valid response
+      if (goShownAt) {
+        const rt = now - goShownAt;
+        const fpForTrial = results.length && results[results.length-1]?.trial === currentTrial && results[results.length-1].premature
+          ? results[results.length-1].foreperiod_ms
+          : null;
+        recordResult({rt, premature: false, foreperiod: fpForTrial ?? 'see trial notes'});
+        prompt.textContent = `RT: ${Math.round(rt)} ms`;
+        prompt.className = 'cue';
+        setStatus(`Captured RT for trial ${currentTrial}.`);
+        nextTrial();
+      }
+    }
+
+    // Event wiring
+    stage.addEventListener('click', handleResponse);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        if (!running && (e.key === 'Enter')) start();
+        else handleResponse();
+      }
+    });
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', () => { finish(); });
+    downloadBtn.addEventListener('click', downloadCSV);
+
+    function start() {
+      // read config
+      totalTrials = Math.max(1, Number(trialsIn.value||1));
+      iti = Math.max(0, Number(itiIn.value||0));
+      practice = Math.max(0, Math.min(totalTrials, Number(practiceIn.value||0)));
+
+      // validate FP inputs
+      if (fpMode.value === 'fixed') {
+        const v = Number(fpFixed.value||0);
+        if (isNaN(v) || v < 0) return alert('Fixed foreperiod must be a non-negative number.');
+      } else {
+        const lo = Number(fpMin.value||0), hi = Number(fpMax.value||0);
+        if (isNaN(lo) || isNaN(hi) || lo < 0 || hi < lo) {
+          return alert('Random foreperiod requires 0 ≤ min ≤ max.');
+        }
+      }
+
+      results = [];
+      running = true; awaitingGo = false; goShownAt = 0; currentTrial = 0;
+      startBtn.disabled = true; stopBtn.disabled = false; downloadBtn.disabled = true;
+      setStatus('Starting…');
+      prompt.textContent = 'Wait for GO…';
+      prompt.className = '';
+      goFullscreenIfNeeded().then(()=>{
+        // small delay to settle
+        setTimeout(prepareTrial, 400);
+      });
+    }
+
+    function downloadCSV() {
+      if (!results.length) return;
+      const headers = Object.keys(results[0]);
+      const rows = results.map(r => headers.map(h => String(r[h] ?? '')).join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const a = document.createElement('a');
+      const pidSafe = (pid.value||'NA').replace(/[^\w-]+/g,'_');
+      a.href = URL.createObjectURL(blob);
+      a.download = `rt_foreperiod_${pidSafe}_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // Improve keyboard focus
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') e.preventDefault();
+    });
+
+    // Accessibility label updates
+    const updateA11y = () => {
+      const mode = fpMode.value === 'fixed' ? `fixed ${fpFixed.value} ms` : `random ${fpMin.value}-${fpMax.value} ms`;
+      stage.setAttribute('aria-label', `Reaction stage, foreperiod ${mode}, press space or enter on GO`);
+    };
+    [fpMode, fpFixed, fpMin, fpMax].forEach(elm => elm.addEventListener('input', updateA11y));
+    updateA11y();
+  </script>
+</body>
+</html>
