@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Simple Reaction Time Test</title>
+  <style>
+    body {
+      background: #0b1020; color: #e6ecff;
+      font-family: Arial, sans-serif; text-align: center;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; margin: 0;
+    }
+    .box {
+      max-width: 500px; padding: 20px;
+      background: #111a33; border-radius: 14px;
+    }
+    button {
+      margin-top: 20px; padding: 12px 20px;
+      font-size: 16px; border: none; border-radius: 10px;
+      background: #62f; color: white; cursor: pointer;
+    }
+    button:disabled { background: #555; }
+    .big { font-size: 32px; font-weight: bold; margin: 30px 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Reaction Time Test</h1>
+    <p>Set the delay (in seconds). When you click <b>Start</b>, wait until the screen says <b>GO!</b>, then click as fast as you can.</p>
+
+    <label>Delay before "GO!": 
+      <input id="delay" type="number" min="1" step="1" value="3"> seconds
+    </label>
+    <br>
+    <button id="startBtn">Start</button>
+    <div class="big" id="prompt">Press Start</div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const prompt = document.getElementById("prompt");
+    const result = document.getElementById("result");
+    const delayInput = document.getElementById("delay");
+
+    let goTime = 0;
+    let waiting = false;
+
+    startBtn.addEventListener("click", () => {
+      const delaySec = Number(delayInput.value);
+      if (isNaN(delaySec) || delaySec <= 0) {
+        alert("Enter a positive number of seconds.");
+        return;
+      }
+
+      prompt.textContent = "Wait for it...";
+      result.textContent = "";
+      startBtn.disabled = true;
+      waiting = true;
+
+      setTimeout(() => {
+        prompt.textContent = "GO!";
+        goTime = performance.now();
+      }, delaySec * 1000);
+    });
+
+    // User response by clicking anywhere or pressing space/enter
+    document.addEventListener("keydown", (e) => {
+      if (e.key === " " || e.key === "Enter") handleResponse();
+    });
+    document.addEventListener("click", handleResponse);
+
+    function handleResponse() {
+      if (!waiting || !goTime) return;
+      const rt = performance.now() - goTime;
+      prompt.textContent = `Your reaction time: ${Math.round(rt)} ms`;
+      result.textContent = "";
+      startBtn.disabled = false;
+      waiting = false;
+      goTime = 0;
+    }
+  </script>
+</body>
+</html>
