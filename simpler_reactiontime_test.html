@@ -1,116 +1,92 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Simple Reaction Time Test</title>
-  <style>
-    body {
-      background: #0b1020; color: #e6ecff;
-      font-family: Arial, sans-serif; text-align: center;
-      display: flex; justify-content: center; align-items: center;
-      height: 100vh; margin: 0;
-    }
-    .box {
-      max-width: 500px; padding: 20px;
-      background: #111a33; border-radius: 14px;
-    }
-    button {
-      margin-top: 12px; padding: 10px 16px;
-      font-size: 16px; border: none; border-radius: 10px;
-      background: #62f; color: white; cursor: pointer;
-    }
-    button:disabled { background: #555; }
-    .big { font-size: 32px; font-weight: bold; margin: 30px 0; }
-    .hidden { display: none; }
-  </style>
+<meta charset="utf-8">
+<title>Reaction Time Test</title>
+<style>
+  body { background:#0b1020;color:#e6ecff;font-family:Arial;text-align:center;
+         display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}
+  .box { max-width:500px;padding:20px;background:#111a33;border-radius:14px;}
+  button { margin-top:12px;padding:10px 16px;font-size:16px;border:none;border-radius:10px;
+           background:#62f;color:white;cursor:pointer;}
+  button:disabled { background:#555;}
+  .big { font-size:32px;font-weight:bold;margin:30px 0;}
+  .hidden { display:none;}
+</style>
 </head>
 <body>
-  <div class="box">
-    <h1>Reaction Time Test</h1>
-    <p>When you click <b>Start</b>, wait until the screen says <b>GO!</b>, then click as fast as you can.</p>
+<div class="box">
+  <h1>Reaction Time Test</h1>
+  <p>Click <b>Start</b>, wait for <b>GO!</b>, then click as fast as you can.</p>
 
-    <!-- Settings container -->
-    <div id="settings">
-      <label>Delay before "GO!": 
-        <input id="delay" type="number" min="1" step="1" value="3"> seconds
-      </label>
-    </div>
-
-    <!-- Toggle button OUTSIDE so it's always available -->
-    <div>
-      <button id="toggleBtn">Hide Settings</button>
-    </div>
-
-    <button id="startBtn">Start</button>
-    <div class="big" id="prompt">Press Start</div>
-    <div id="result"></div>
+  <div id="settings">
+    <label>Delay before "GO!": <input id="delay" type="number" min="1" step="1" value="3"> seconds</label>
   </div>
 
-  <script>
-    const startBtn = document.getElementById("startBtn");
-    const prompt = document.getElementById("prompt");
-    const result = document.getElementById("result");
-    const delayInput = document.getElementById("delay");
-    const settings = document.getElementById("settings");
-    const toggleBtn = document.getElementById("toggleBtn");
+  <button id="toggleBtn">Hide Settings</button>
+  <button id="startBtn">Start</button>
+  <div class="big" id="prompt">Press Start</div>
+  <div id="result"></div>
+</div>
 
-    let goTime = 0;
-    let waiting = false;
+<script>
+const startBtn = document.getElementById("startBtn");
+const prompt = document.getElementById("prompt");
+const result = document.getElementById("result");
+const delayInput = document.getElementById("delay");
+const settings = document.getElementById("settings");
+const toggleBtn = document.getElementById("toggleBtn");
 
-    startBtn.addEventListener("click", () => {
-      const delaySec = Number(delayInput.value);
-      if (isNaN(delaySec) || delaySec <= 0) {
-        alert("Enter a positive number of seconds.");
-        return;
-      }
+let goTime = 0;
+let waiting = false;
 
-      // Hide settings when starting
-      if (!settings.classList.contains("hidden")) {
-        settings.classList.add("hidden");
-        toggleBtn.textContent = "Show Settings";
-      }
+startBtn.addEventListener("click", () => {
+  const delaySec = Number(delayInput.value);
+  if (isNaN(delaySec) || delaySec <= 0) { alert("Enter a positive number of seconds."); return; }
 
-      prompt.textContent = "Wait for it...";
-      result.textContent = "";
-      startBtn.disabled = true;
-      waiting = true;
+  // Hide settings automatically
+  if (!settings.classList.contains("hidden")) {
+    settings.classList.add("hidden");
+    toggleBtn.textContent = "Show Settings";
+  }
 
-      setTimeout(() => {
-        prompt.textContent = "GO!";
-        goTime = performance.now();
-      }, delaySec * 1000);
-    });
+  prompt.textContent = "Wait for it...";
+  result.textContent = "";
+  startBtn.disabled = true;
+  waiting = true;
 
-    // User response (mouse click or space/enter)
-    document.addEventListener("keydown", (e) => {
-      if (e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-        handleResponse();
-      }
-    });
-    document.addEventListener("click", handleResponse);
+  setTimeout(() => {
+    prompt.textContent = "GO!";
+    goTime = performance.now();
+  }, delaySec * 1000);
+});
 
-    function handleResponse() {
-      if (!waiting || !goTime) return;
-      const rt = performance.now() - goTime;
-      prompt.textContent = `Your reaction time: ${Math.round(rt)} ms`;
-      startBtn.disabled = false;
-      waiting = false;
-      goTime = 0;
-    }
+// User response
+function handleResponse() {
+  if (!waiting || !goTime) return;
+  const rt = performance.now() - goTime;
+  prompt.textContent = `Your reaction time: ${Math.round(rt)} ms`;
+  startBtn.disabled = false;
+  waiting = false;
+  goTime = 0;
+}
 
-    // Toggle button
-    toggleBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // don’t let toggle click count as a response
+document.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.key === "Enter") { e.preventDefault(); handleResponse(); }
+});
+document.addEventListener("click", handleResponse);
 
-      if (settings.classList.contains("hidden")) {
-        settings.classList.remove("hidden");
-        toggleBtn.textContent = "Hide Settings";
-      } else {
-        settings.classList.add("hidden");
-        toggleBtn.textContent = "Show Settings";
-      }
-    });
-  </script>
+// Toggle button
+toggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // <— prevent bubbling
+  if (settings.classList.contains("hidden")) {
+    settings.classList.remove("hidden");
+    toggleBtn.textContent = "Hide Settings";
+  } else {
+    settings.classList.add("hidden");
+    toggleBtn.textContent = "Show Settings";
+  }
+});
+</script>
 </body>
 </html>
