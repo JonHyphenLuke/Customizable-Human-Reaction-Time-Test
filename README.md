@@ -2,4 +2,4 @@ This project has a custumizable "Human Reaction time Benchmark test" where you c
 
 
 click on this to run the test
-https://jonhyphenluke.github.io/Customizable-Human-ReactionTime-Test
+https://jonhyphenluke.github.io/Customizable-Human-Reaction-Time-Test
