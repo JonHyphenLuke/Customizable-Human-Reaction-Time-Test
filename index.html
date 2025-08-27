@@ -30,13 +30,40 @@
 
   }
   button { 
-    margin-top:12px;padding:10px 16px;font-size:16px;border:none;border-radius:10px;
-    background:#62f;color:white;cursor:pointer; 
-  }
-  button:disabled { background:#555; }
-  .big { font-size:32px;font-weight:bold;margin:30px 0;}
-  .hidden { display:none;}
-  #footer { font-size:14px;color:#aaa;text-align:center; }
+  margin-top: 12px;
+  padding: 12px 20px;        /* base size for normal buttons */
+  font-size: 18px;           
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  background: #62f;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.1s ease-in-out, background 0.2s;
+}
+
+button:hover {
+  background: #4a1fff;
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+/* Special style for Start button */
+#startBtn {
+  padding: 18px 32px;       /* bigger */
+  font-size: 22px;          /* bigger text */
+  background: #1fa34a;      /* green to stand out */
+}
+
+#startBtn:hover {
+  background: #17853b;
+}
+
 </style>
 </head>
 <body>
