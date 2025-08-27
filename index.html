@@ -38,7 +38,7 @@ button {
   background: #62f;
   color: white;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  -shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.1s ease-in-out, background 0.2s;
 }
 
@@ -73,26 +73,34 @@ button:disabled {
 <div class="container">
   <div class="box">
     <h1>Reaction Time Test</h1>
-    <p>Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you see <strong>GO!</strong>.</p>
+    <p>
+      Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you
+      see <strong>GO!</strong>.
+    </p>
+
+    <!-- Prompt + results -->
+    <div id="prompt">Press Start</div>
+    <div id="result"></div>
+
+    <!-- Start button -->
+    <button id="startBtn">Start</button>
 
     <!-- Settings container -->
     <div id="settings">
-      <label>Delay before "GO!": <input id="delay" type="number" min="1" step="1" value="5"> seconds</label>
+      <label>
+        Delay before "GO!":
+        <input id="delay" type="number" min="1" step="1" value="5" /> seconds
+      </label>
+
+      <!-- Toggle button INSIDE the same container -->
+      <div>
+        <button id="toggleBtn">Hide Settings</button>
+      </div>
     </div>
 
-    <!-- Toggle button -->
-    <div>
-      <button id="toggleBtn">Hide Settings</button>
-    </div>
-
-    <button id="startBtn">Start</button>
-    <div class="big" id="prompt">Press Start</div>
-    <div id="result"></div>
+    <!-- Footer always visible -->
+    <div id="footer">Created by Jon-luke Sadowsky</div>
   </div>
-
-  <!-- Footer always visible -->
-  <div id="footer">Created by Jon-luke Sadowsky</div>
-</div>
 
 <script>
 const startBtn = document.getElementById("startBtn");
