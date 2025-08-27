@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reaction Time Test</title>
+<style>
+  body {
+    background:#0b1020; color:#e6ecff; font-family:Arial,sans-serif; text-align:center;
+    margin:0; padding:0;
+  }
+  b, strong { font-weight: bold; }
+  .container {
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    min-height:100vh;
+  }
+  .box {
+    width:500px; padding:20px; background:#111a33; border-radius:14px; margin-bottom:20px;
+  }
+  #prompt {
+    border: 3px solid #62f; border-radius:12px; padding:20px;
+    display:inline-block; min-width:200px; font-size:24px; margin:20px 0;
+  }
+  button {
+    margin-top:12px; padding:12px 20px; font-size:18px; font-weight:bold;
+    border:none; border-radius:10px; background:#62f; color:white;
+    cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.1s ease-in-out, background 0.2s;
+  }
+  button:hover {
+    background:#4a1fff; transform: scale(1.05);
+  }
+  button:disabled {
+    background:#555; cursor:not-allowed;
+  }
+  .hidden { display:none; }
+  #startBtn {
+    padding:18px 32px; font-size:22px; background:#1fa34a;
+  }
+  #startBtn:hover {
+    background:#17853b;
+  }
+  #footer {
+    font-size:14px; color:#aaa; text-align:center; margin-top:20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="box">
+    <h1>Reaction Time Test</h1>
+    <p>Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you see <strong>GO!</strong>.</p>
+
+    <div id="prompt">Press Start</div>
+    <div id="result"></div>
+
+    <button id="startBtn">Start</button>
+
+    <div id="settings">
+      <label>
+        Delay before "GO!": <input id="delay" type="number" min="1" step="1" value="5"> seconds
+      </label>
+      <div>
+        <button id="toggleBtn">Hide Settings</button>
+      </div>
+    </div>
+
+    <div id="footer">Created by Jon-luke Sadowsky</div>
+  </div>
+</div>
+
+<script>
+const startBtn = document.getElementById("startBtn");
+const promptEl = document.getElementById("prompt");
+const resultEl = document.getElementById("result");
+const delayInput = document.getElementById("delay");
+const settings = document.getElementById("settings");
+const toggleBtn = document.getElementById("toggleBtn");
+
+let goTime = 0;
+let waiting = false;
+
+startBtn.addEventListener("click", () => {
+  const delaySec = Number(delayInput.value);
+  if (isNaN(delaySec) || delaySec <= 0) { alert("Enter a positive number of seconds."); return; }
+
+  if (!settings.classList.contains("hidden")) {
+    settings.classList.add("hidden");
+    toggleBtn.textContent = "Show Settings";
+  }
+
+  promptEl.textContent = "Wait for it...";
+  resultEl.textContent = "";
+  startBtn.disabled = true;
+  waiting = true;
+
+  setTimeout(() => {
+    promptEl.textContent = "GO!";
+    goTime = performance.now();
+  }, delaySec * 1000);
+});
+
+function handleResponse(e) {
+  if (e && e.target === toggleBtn) return;
+  if (!waiting || !goTime) return;
+
+  const rt = performance.now() - goTime;
+  promptEl.textContent = `Your reaction time: ${Math.round(rt)} ms`;
+  resultEl.textContent = "";
+  startBtn.disabled = false;
+  waiting = false;
+  goTime = 0;
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.key === "Enter") {
+    e.preventDefault();
+    handleResponse(e);
+  }
+});
+document.addEventListener("click", handleResponse);
+
+toggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (settings.classList.contains("hidden")) {
+    settings.classList.remove("hidden");
+    toggleBtn.textContent = "Hide Settings";
+  } else {
+    settings.classList.add("hidden");
+    toggleBtn.textContent = "Show Settings";
+  }
+});
+</script>
+</body>
+</html>
