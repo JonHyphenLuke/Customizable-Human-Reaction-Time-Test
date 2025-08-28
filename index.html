@@ -104,7 +104,7 @@
   <div class="box">
     <button id="modeToggle">Mode: Custom</button>
     <h1>Reaction Time Test</h1>
-    <p id="instructions">Click <b>Start</b>, wait for <b>GO!</b>, then click as soon as you see <b>GO!</b>.</p>
+    <p id="instructions">Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you see <b>GO!</b>.</p>
 
     <div id="prompt">Press Start to Begin</div>
     <div id="result"></div>
@@ -277,7 +277,7 @@ modeToggle.addEventListener("click", () => {
   } else {
     mode = "custom";
     modeToggle.textContent = "Mode: Custom";
-    instructions.textContent = "Click Start, wait for GO!, then click as soon as you see GO!.";
+    instructions.textContent = "Click Start, wait for GO!, then click in the box as soon as you see GO!.";
     toggleBtn.disabled = false;
     startBtn.textContent = "Start";
     prompt.textContent = "Press Start to Begin";
