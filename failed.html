@@ -158,6 +158,11 @@ let trial = 0;
 let trialResults = [];
 let sendData = false; // only send if first-time checkbox is checked
 
+// ===== Checkbox listener added once =====
+firstTimeCheckbox.addEventListener("change", (e) => {
+  sendData = e.target.checked;
+});
+
 // ========== CUSTOM MODE ==========
 function startCustom() {
   const delaySec = Number(delayInput.value);
@@ -306,10 +311,6 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
-    firstTimeCheckbox.addEventListener("change", (e) => {
-      sendData = e.target.checked;
-    });
-
   } else {
     // switch to Custom
     mode = "custom";
@@ -328,7 +329,7 @@ modeToggle.addEventListener("click", () => {
 
 // ===== Send results to Google Apps Script =====
 function sendResults(trial1, trial2, trial3) {
-  const url = "YOUR_APPS_SCRIPT_URL_HERE";
+  const url = "YOUR_APPS_SCRIPT_URL_HERE"; // replace with your script URL
 
   fetch(url, {
     method: "POST",
