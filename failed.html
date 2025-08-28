@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reaction Time Test</title>
+<style>
+  body { 
+    background:#0b1020;
+    color:#e6ecff;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    margin:0;
+    padding:0;
+  }
+
+  .container {
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+  }
+
+  .box { 
+    width:500px;
+    padding:20px;
+    background:#111a33;
+    border-radius:14px;
+    margin-bottom:20px;
+    position:relative;
+  }
+
+  #modeToggle {
+    position:absolute;
+    top:10px;
+    right:10px;
+    padding:8px 14px;
+    font-size:14px;
+    border:none;
+    border-radius:8px;
+    background:#f39c12;
+    color:white;
+    cursor:pointer;
+    box-shadow:0 3px 6px rgba(0,0,0,0.3);
+  }
+
+  #prompt {
+    border: 3px solid #62f;
+    border-radius: 12px;
+    padding: 20px;
+    display: inline-block;
+    min-width: 200px;
+    margin: 15px 0;
+  }
+
+  button { 
+    margin-top: 12px;
+    padding: 12px 20px;
+    font-size: 18px;           
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    background: #62f;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.1s ease-in-out, background 0.2s;
+  }
+
+  button:hover {
+    background: #4a1fff;
+    transform: scale(1.05);
+  }
+
+  button:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #startBtn {
+    padding: 18px 32px;
+    font-size: 22px;
+    background: #1fa34a;
+    margin-bottom: 10px;
+  }
+
+  #startBtn:hover {
+    background: #17853b;
+  }
+
+  #footer {
+    margin-top: 20px;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  #settings label {
+    display: block;
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="box">
+    <button id="modeToggle">Mode: Custom</button>
+    <h1>Reaction Time Test</h1>
+    <p id="instructions">Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you see <b>GO!</b>.</p>
+
+    <div id="prompt">Press Start to Begin</div>
+    <div id="result"></div>
+
+    <button id="startBtn">Start</button>
+    <button id="toggleBtn">Hide Settings</button>
+
+    <div id="settings">
+      <label>
+        Delay before "GO!": 
+        <input id="delay" type="number" min="1" step="1" value="5"> seconds
+      </label>
+      <label>
+        <input type="checkbox" id="firstTimeCheckbox">
+        First time using Blind Mode
+      </label>
+    </div>
+  </div>
+
+  <div id="footer">Created by Jon-luke Sadowsky</div>
+</div>
+
+<script>
+const startBtn = document.getElementById("startBtn");
+const prompt = document.getElementById("prompt");
+const result = document.getElementById("result");
+const delayInput = document.getElementById("delay");
+const settings = document.getElementById("settings");
+const toggleBtn = document.getElementById("toggleBtn");
+const modeToggle = document.getElementById("modeToggle");
+const instructions = document.getElementById("instructions");
+
+let goTime = 0;
+let waiting = false;
+let mode = "custom"; // "custom" or "blind"
+let trial = 0;
+let trialResults = [];
+
+// ===== Additional Blind Mode Variables =====
+let firstTimeClicked = false;
+let trialCount = 0;
+let trialTimes = [];
+
+// ========== CUSTOM MODE ==========
+function startCustom() {
+  const delaySec = Number(delayInput.value);
+  if (isNaN(delaySec) || delaySec <= 0) { 
+    alert("Enter a positive number of seconds."); 
+    return; 
+  }
+
+  if (!settings.classList.contains("hidden")) {
+    settings.classList.add("hidden");
+    toggleBtn.textContent = "Show Settings";
+  }
+
+  prompt.textContent = "Wait for it...";
+  result.textContent = "";
+  startBtn.disabled = true;
+  waiting = true;
+
+  setTimeout(() => {
+    prompt.textContent = "GO!";
+    goTime = performance.now();
+  }, delaySec * 1000);
+}
+
+// ========== BLIND MODE ==========
+function startBlindMode() {
+  trialCount = 0;
+  trialTimes = [];
+  firstTimeClicked = document.getElementById("firstTimeCheckbox")?.checked || false;
+  nextBlindTrial();
+}
+
+function nextBlindTrial() {
+  if (trialCount >= 3) {
+    endBlindMode();
+    return;
+  }
+
+  alert("Press OK when ready for Trial " + (trialCount + 1));
+
+  let waitTimes = [10000, 20000, 30000]; // 10s, 20s, 30s
+  let waitTime = waitTimes[trialCount];
+
+  document.body.style.backgroundColor = "red";
+
+  setTimeout(() => {
+    document.body.style.backgroundColor = "green";
+    let start = performance.now();
+
+    function handleClick() {
+      let reaction = performance.now() - start;
+      trialTimes.push(reaction.toFixed(2));
+      document.body.removeEventListener("click", handleClick);
+      trialCount++;
+      nextBlindTrial();
+    }
+
+    document.body.addEventListener("click", handleClick);
+  }, waitTime);
+}
+
+function endBlindMode() {
+  document.body.style.backgroundColor = "#0b1020";
+
+  let resultsText = `Trial 1: ${trialTimes[0]} ms\nTrial 2: ${trialTimes[1]} ms\nTrial 3: ${trialTimes[2]} ms`;
+  alert("All Trials Complete!\n\n" + resultsText);
+
+  sendResults(trialTimes[0], trialTimes[1], trialTimes[2], firstTimeClicked);
+}
+
+// ========== RESPONSE HANDLER ==========
+function handleResponse(e) {
+  if (e && e.target === toggleBtn) return;
+  if (e && e.target === modeToggle) return;
+
+  if (!waiting || !goTime) return;
+
+  const rt = Math.round(performance.now() - goTime);
+  waiting = false;
+  goTime = 0;
+  startBtn.disabled = false;
+
+  if (mode === "custom") {
+    prompt.textContent = `Your reaction time: ${rt} ms`;
+  } else {
+    prompt.textContent = `Trial ${trial+1} result: ${rt} ms`;
+    finishBlindTrial(rt);
+  }
+}
+
+// ========== BUTTON LISTENERS ==========
+startBtn.addEventListener("click", () => {
+  if (mode === "custom") {
+    startCustom();
+  } else {
+    if (!waiting && goTime === 0) {
+      startBlindMode();
+    }
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.key === "Enter") { 
+    e.preventDefault(); 
+    handleResponse(e); 
+  }
+});
+document.addEventListener("click", handleResponse);
+
+toggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (settings.classList.contains("hidden")) {
+    settings.classList.remove("hidden");
+    toggleBtn.textContent = "Hide Settings";
+  } else {
+    settings.classList.add("hidden");
+    toggleBtn.textContent = "Show Settings";
+  }
+});
+
+// Mode switch
+modeToggle.addEventListener("click", () => {
+  if (mode === "custom") {
+    mode = "blind";
+    modeToggle.textContent = "Mode: Blind";
+    instructions.textContent = "In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
+    settings.classList.add("hidden");
+    toggleBtn.disabled = true;
+    prompt.textContent = "Press Start to Begin Blind Test";
+    result.textContent = "";
+  } else {
+    mode = "custom";
+    modeToggle.textContent = "Mode: Custom";
+    instructions.textContent = "Click Start, wait for GO!, then click in the box as soon as you see GO!.";
+    toggleBtn.disabled = false;
+    startBtn.textContent = "Start";
+    prompt.textContent = "Press Start to Begin";
+    result.textContent = "";
+  }
+});
+
+// ===== Send results to Google Apps Script =====
+function sendResults(trial1, trial2, trial3, firstTimeClicked) {
+  const url = "https://script.google.com/macros/s/AKfycbz2gdd1WZG8RxwZes7ZfSgAmttLaYwo4unNqFlgaeEyfrvKzb9SY_Nb9OJJelGzOpyW-Q/exec";
+
+  fetch(url, {
+    method: "POST",
+    body: JSON.stringify({
+      trial1: trial1,
+      trial2: trial2,
+      trial3: trial3,
+      firstTime: firstTimeClicked
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(res => console.log("Data sent:", res))
+  .catch(err => console.error("Error:", err));
+}
+</script>
+</body>
+</html>
