@@ -102,12 +102,23 @@
     display:block;
     margin: 10px 0;
   }
+
+  #firstTimeLabel {
+    display:block;
+    margin-bottom: 10px;
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="box">
     <button id="modeToggle">Mode: Custom</button>
+
+    <!-- First-time checkbox, now above the title -->
+    <label id="firstTimeLabel" class="hidden">
+      <input type="checkbox" id="firstTimeCheckbox"> First time using Blind Mode
+    </label>
+
     <h1>Reaction Time Test</h1>
     <p id="instructions">Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you see <b>GO!</b>.</p>
 
@@ -121,9 +132,6 @@
       <label>
         Delay before "GO!": 
         <input id="delay" type="number" min="1" step="1" value="5">
-      </label>
-      <label id="firstTimeLabel" class="hidden">
-        <input type="checkbox" id="firstTimeCheckbox"> First time using Blind Mode
       </label>
     </div>
   </div>
@@ -309,13 +317,15 @@ modeToggle.addEventListener("click", () => {
     startBtn.textContent = "Start";
     prompt.textContent = "Press Start to Begin";
     result.textContent = "";
+
+    // hide the checkbox in custom mode
     firstTimeLabel.classList.add("hidden");
   }
 });
 
 // ===== Send results to Google Apps Script =====
 function sendResults(trial1, trial2, trial3) {
-  const url = "https://script.google.com/macros/s/AKfycbz2gdd1WZG8RxwZes7ZfSgAmttLaYwo4unNqFlgaeEyfrvKzb9SY_Nb9OJJelGzOpyW-Q/exec";
+  const url = "YOUR_APPS_SCRIPT_URL_HERE";
 
   fetch(url, {
     method: "POST",
