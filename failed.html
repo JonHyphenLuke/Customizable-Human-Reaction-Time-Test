@@ -114,7 +114,7 @@
   <div class="box">
     <button id="modeToggle">Mode: Custom</button>
 
-    <!-- First-time checkbox, now above the title -->
+    <!-- First-time checkbox, above title and hidden by default -->
     <label id="firstTimeLabel" class="hidden">
       <input type="checkbox" id="firstTimeCheckbox"> First time using Blind Mode
     </label>
@@ -289,6 +289,7 @@ toggleBtn.addEventListener("click", (e) => {
 // Mode switch
 modeToggle.addEventListener("click", () => {
   if (mode === "custom") {
+    // switch to Blind
     mode = "blind";
     modeToggle.textContent = "Mode: Blind";
     instructions.textContent = "In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
@@ -310,6 +311,7 @@ modeToggle.addEventListener("click", () => {
     });
 
   } else {
+    // switch to Custom
     mode = "custom";
     modeToggle.textContent = "Mode: Custom";
     instructions.textContent = "Click Start, wait for GO!, then click in the box as soon as you see GO!.";
@@ -320,6 +322,7 @@ modeToggle.addEventListener("click", () => {
 
     // hide the checkbox in custom mode
     firstTimeLabel.classList.add("hidden");
+    sendData = false;
   }
 });
 
