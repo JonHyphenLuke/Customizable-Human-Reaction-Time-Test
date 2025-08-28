@@ -5,10 +5,14 @@
 <title>Reaction Time Test</title>
 <style>
   body { 
-    background:#0b1020;color:#e6ecff;font-family:Arial,sans-serif;text-align:center;
-    margin:0;padding:0;
+    background:#0b1020;
+    color:#e6ecff;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    margin:0;
+    padding:0;
   }
-  b, strong { font-weight: bold; } /* <-- add this */
+
   .container {
     display:flex;
     flex-direction:column;
@@ -16,91 +20,97 @@
     align-items:center;
     min-height:100vh;
   }
+
   .box { 
-    width:500px;padding:20px;background:#111a33;border-radius:14px;margin-bottom:20px;
-  }
-  
-   #prompt {
-    border: 3px solid #62f;   /* outline color (matches your buttons) */
-    border-radius: 12px;      /* rounded corners */
-    padding: 20px;            /* spacing so text doesn’t touch border */
-    display: inline-block;    /* so border hugs the text nicely */
-    min-width: 200px;         /* keeps it from being too small */
+    width:500px;
+    padding:20px;
+    background:#111a33;
+    border-radius:14px;
+    margin-bottom:20px;
   }
 
-button { 
-  margin-top: 12px;
-  padding: 12px 20px;        /* base size for normal buttons */
-  font-size: 18px;           
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  background: #62f;
-  color: white;
-  cursor: pointer;
-  -shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: transform 0.1s ease-in-out, background 0.2s;
-}
+  #prompt {
+    border: 3px solid #62f;
+    border-radius: 12px;
+    padding: 20px;
+    display: inline-block;
+    min-width: 200px;
+    margin: 15px 0;
+  }
 
-button:hover {
-  background: #4a1fff;
-  transform: scale(1.05);
-}
+  button { 
+    margin-top: 12px;
+    padding: 12px 20px;
+    font-size: 18px;           
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    background: #62f;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.1s ease-in-out, background 0.2s;
+  }
 
-button:disabled {
-  background: #555;
-  cursor: not-allowed;
-}
-  
-.hidden {
-  display: none;
-}
+  button:hover {
+    background: #4a1fff;
+    transform: scale(1.05);
+  }
 
-/* Special style for Start button */
-#startBtn {
-  padding: 18px 32px;       /* bigger */
-  font-size: 22px;          /* bigger text */
-  background: #1fa34a;      /* green to stand out */
-}
+  button:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
 
-#startBtn:hover {
-  background: #17853b;
-}
+  .hidden {
+    display: none;
+  }
 
+  /* Special style for Start button */
+  #startBtn {
+    padding: 18px 32px;
+    font-size: 22px;
+    background: #1fa34a;
+    margin-bottom: 10px;
+  }
+
+  #startBtn:hover {
+    background: #17853b;
+  }
+
+  #footer {
+    margin-top: 20px;
+    font-size: 14px;
+    opacity: 0.7;
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="box">
     <h1>Reaction Time Test</h1>
-    <p>
-      Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you
-      see <strong>GO!</strong>.
-    </p>
+    <p>Click <b>Start</b>, wait for <b>GO!</b>, then click in the box as soon as you see <b>GO!</b>.</p>
 
-    <!-- Prompt + results -->
-    <div id="prompt">Press Start</div>
+    <!-- Prompt area -->
+    <div id="prompt">Press Start to Begin</div>
     <div id="result"></div>
 
-    <!-- Start button -->
+    <!-- Buttons -->
     <button id="startBtn">Start</button>
+    <button id="toggleBtn">Hide Settings</button>
 
     <!-- Settings container -->
     <div id="settings">
       <label>
-        Delay before "GO!":
-        <input id="delay" type="number" min="1" step="1" value="5" /> seconds
+        Delay before "GO!": 
+        <input id="delay" type="number" min="1" step="1" value="5"> seconds
       </label>
-
-      <!-- Toggle button INSIDE the same container -->
-      <div>
-        <button id="toggleBtn">Hide Settings</button>
-      </div>
     </div>
-
-    <!-- Footer always visible -->
-    <div id="footer">Created by Jon-luke Sadowsky</div>
   </div>
+
+  <!-- Footer always visible -->
+  <div id="footer">Created by Jon-luke Sadowsky</div>
+</div>
 
 <script>
 const startBtn = document.getElementById("startBtn");
@@ -115,7 +125,10 @@ let waiting = false;
 
 startBtn.addEventListener("click", () => {
   const delaySec = Number(delayInput.value);
-  if (isNaN(delaySec) || delaySec <= 0) { alert("Enter a positive number of seconds."); return; }
+  if (isNaN(delaySec) || delaySec <= 0) { 
+    alert("Enter a positive number of seconds."); 
+    return; 
+  }
 
   // Hide settings automatically
   if (!settings.classList.contains("hidden")) {
@@ -148,7 +161,10 @@ function handleResponse(e) {
 }
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === " " || e.key === "Enter") { e.preventDefault(); handleResponse(e); }
+  if (e.key === " " || e.key === "Enter") { 
+    e.preventDefault(); 
+    handleResponse(e); 
+  }
 });
 document.addEventListener("click", handleResponse);
 
