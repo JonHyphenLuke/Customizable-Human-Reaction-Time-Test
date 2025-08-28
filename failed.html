@@ -99,7 +99,7 @@
   }
 
   #settings label {
-    display: block;
+    display:block;
     margin: 10px 0;
   }
 </style>
@@ -120,11 +120,10 @@
     <div id="settings">
       <label>
         Delay before "GO!": 
-        <input id="delay" type="number" min="1" step="1" value="5"> seconds
+        <input id="delay" type="number" min="1" step="1" value="5">
       </label>
-      <label>
-        <input type="checkbox" id="firstTimeCheckbox">
-        First time using Blind Mode
+      <label id="firstTimeLabel" class="hidden">
+        <input type="checkbox" id="firstTimeCheckbox"> First time using Blind Mode
       </label>
     </div>
   </div>
@@ -141,17 +140,15 @@ const settings = document.getElementById("settings");
 const toggleBtn = document.getElementById("toggleBtn");
 const modeToggle = document.getElementById("modeToggle");
 const instructions = document.getElementById("instructions");
+const firstTimeLabel = document.getElementById("firstTimeLabel");
+const firstTimeCheckbox = document.getElementById("firstTimeCheckbox");
 
 let goTime = 0;
 let waiting = false;
 let mode = "custom"; // "custom" or "blind"
 let trial = 0;
 let trialResults = [];
-
-// ===== Additional Blind Mode Variables =====
-let firstTimeClicked = false;
-let trialCount = 0;
-let trialTimes = [];
+let sendData = false; // only send if first-time checkbox is checked
 
 // ========== CUSTOM MODE ==========
 function startCustom() {
@@ -178,49 +175,53 @@ function startCustom() {
 }
 
 // ========== BLIND MODE ==========
-function startBlindMode() {
-  trialCount = 0;
-  trialTimes = [];
-  firstTimeClicked = document.getElementById("firstTimeCheckbox")?.checked || false;
-  nextBlindTrial();
-}
+const blindDelays = [10, 20, 30]; // seconds
 
-function nextBlindTrial() {
-  if (trialCount >= 3) {
-    endBlindMode();
+function startBlind() {
+  if (trial >= blindDelays.length) {
+    // show results
+    let output = "All Trials Complete:<br>";
+    trialResults.forEach((rt, i) => {
+      output += `Trial ${i+1} (${blindDelays[i]}s wait): ${rt} ms<br>`;
+    });
+    prompt.innerHTML = output;
+    startBtn.disabled = false;
+    startBtn.textContent = "Restart Blind Test";
+
+    // only send if checkbox was checked
+    if (sendData) {
+      sendResults(trialResults[0], trialResults[1], trialResults[2]);
+    }
+
+    trial = 0;
+    trialResults = [];
     return;
   }
 
-  alert("Press OK when ready for Trial " + (trialCount + 1));
+  prompt.textContent = `Trial ${trial+1}: Press Start when ready`;
+  result.textContent = "";
 
-  let waitTimes = [10000, 20000, 30000]; // 10s, 20s, 30s
-  let waitTime = waitTimes[trialCount];
-
-  document.body.style.backgroundColor = "red";
-
-  setTimeout(() => {
-    document.body.style.backgroundColor = "green";
-    let start = performance.now();
-
-    function handleClick() {
-      let reaction = performance.now() - start;
-      trialTimes.push(reaction.toFixed(2));
-      document.body.removeEventListener("click", handleClick);
-      trialCount++;
-      nextBlindTrial();
-    }
-
-    document.body.addEventListener("click", handleClick);
-  }, waitTime);
+  startBtn.disabled = false;
+  startBtn.textContent = "Start Trial";
 }
 
-function endBlindMode() {
-  document.body.style.backgroundColor = "#0b1020";
+function runBlindTrial() {
+  const waitSec = blindDelays[trial];
+  prompt.textContent = "Wait for it...";
+  result.textContent = "";
+  startBtn.disabled = true;
+  waiting = true;
 
-  let resultsText = `Trial 1: ${trialTimes[0]} ms\nTrial 2: ${trialTimes[1]} ms\nTrial 3: ${trialTimes[2]} ms`;
-  alert("All Trials Complete!\n\n" + resultsText);
+  setTimeout(() => {
+    prompt.textContent = "GO!";
+    goTime = performance.now();
+  }, waitSec * 1000);
+}
 
-  sendResults(trialTimes[0], trialTimes[1], trialTimes[2], firstTimeClicked);
+function finishBlindTrial(rt) {
+  trialResults.push(rt);
+  trial++;
+  setTimeout(() => startBlind(), 1000);
 }
 
 // ========== RESPONSE HANDLER ==========
@@ -249,7 +250,11 @@ startBtn.addEventListener("click", () => {
     startCustom();
   } else {
     if (!waiting && goTime === 0) {
-      startBlindMode();
+      if (startBtn.textContent === "Start Trial") {
+        runBlindTrial();
+      } else {
+        startBlind();
+      }
     }
   }
 });
@@ -281,8 +286,21 @@ modeToggle.addEventListener("click", () => {
     instructions.textContent = "In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
     settings.classList.add("hidden");
     toggleBtn.disabled = true;
+    trial = 0;
+    trialResults = [];
     prompt.textContent = "Press Start to Begin Blind Test";
     result.textContent = "";
+    startBtn.textContent = "Start";
+
+    // show the first-time checkbox
+    firstTimeLabel.classList.remove("hidden");
+    firstTimeCheckbox.checked = false;
+    sendData = false;
+
+    firstTimeCheckbox.addEventListener("change", (e) => {
+      sendData = e.target.checked;
+    });
+
   } else {
     mode = "custom";
     modeToggle.textContent = "Mode: Custom";
@@ -291,24 +309,18 @@ modeToggle.addEventListener("click", () => {
     startBtn.textContent = "Start";
     prompt.textContent = "Press Start to Begin";
     result.textContent = "";
+    firstTimeLabel.classList.add("hidden");
   }
 });
 
 // ===== Send results to Google Apps Script =====
-function sendResults(trial1, trial2, trial3, firstTimeClicked) {
+function sendResults(trial1, trial2, trial3) {
   const url = "https://script.google.com/macros/s/AKfycbz2gdd1WZG8RxwZes7ZfSgAmttLaYwo4unNqFlgaeEyfrvKzb9SY_Nb9OJJelGzOpyW-Q/exec";
 
   fetch(url, {
     method: "POST",
-    body: JSON.stringify({
-      trial1: trial1,
-      trial2: trial2,
-      trial3: trial3,
-      firstTime: firstTimeClicked
-    }),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    body: JSON.stringify({ trial1, trial2, trial3 }),
+    headers: { "Content-Type": "application/json" }
   })
   .then(res => res.json())
   .then(res => console.log("Data sent:", res))
