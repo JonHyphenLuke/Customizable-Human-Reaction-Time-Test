@@ -1,5 +1,10 @@
-This project has a custumizable "Human Reaction time Benchmark test" where you can set the amount to second before it prompts you to click on the screen. You can also hide what value you have the timer set to, you can click "show settings" to bring it back up if you want to change anything. If you forget to close the settings when you press run it will close the settings automaticly and you can open it up after with the show settings button
+This project has a custumizable "Human Reaction time Benchmark test" where you can set the amount to second before it prompts you to click on the screen. You can also hide what value you have the timer set to, you can click "show settings" to bring it back up if you want to change anything. If you forget to close the settings when you press run it will close the settings automaticly and you can open it up after with the show settings button.
 
+  NEW MODEEEEE
+
+  A new mode has been added called "Blind" it will trial you on 3 diferent trials all with set times you cant see and then at the end it will display your score for each trial, take a screenshot and send it to me if you do this is for a pychology study haha
+
+  to accsess the new mode in the top right there is a button that can toggle between them
 
 click on this to run the test
 https://jonhyphenluke.github.io/Customizable-Human-Reaction-Time-Test
