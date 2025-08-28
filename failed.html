@@ -98,14 +98,9 @@
     opacity: 0.7;
   }
 
-  #settings label {
+  #settings label, #firstTimeLabel {
     display:block;
     margin: 10px 0;
-  }
-
-  #firstTimeLabel {
-    display:block;
-    margin-bottom: 10px;
   }
 </style>
 </head>
@@ -114,7 +109,7 @@
   <div class="box">
     <button id="modeToggle">Mode: Custom</button>
 
-    <!-- First-time checkbox, above title and hidden by default -->
+    <!-- First-time checkbox, hidden by default -->
     <label id="firstTimeLabel" class="hidden">
       <input type="checkbox" id="firstTimeCheckbox"> First time using Blind Mode
     </label>
@@ -157,6 +152,11 @@ let mode = "custom"; // "custom" or "blind"
 let trial = 0;
 let trialResults = [];
 let sendData = false; // only send if first-time checkbox is checked
+
+// ===== Hide checkbox on page load =====
+firstTimeLabel.classList.add("hidden");
+firstTimeCheckbox.checked = false;
+sendData = false;
 
 // ===== Checkbox listener added once =====
 firstTimeCheckbox.addEventListener("change", (e) => {
@@ -323,6 +323,7 @@ modeToggle.addEventListener("click", () => {
 
     // hide the checkbox in custom mode
     firstTimeLabel.classList.add("hidden");
+    firstTimeCheckbox.checked = false;
     sendData = false;
   }
 });
