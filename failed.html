@@ -73,8 +73,8 @@
   }
 
   button:disabled {
-    background: #555;
     cursor: not-allowed;
+    background: #555 !important;
   }
 
   #startBtn {
@@ -297,6 +297,11 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
+    // Disable settings button
+    toggleBtn.disabled = true;
+    toggleBtn.style.background = "#555";
+    settings.classList.remove("hidden"); // optional
+
   } else {
     mode = "custom";
     modeToggle.textContent = "Mode: Custom";
@@ -308,6 +313,10 @@ modeToggle.addEventListener("click", () => {
     firstTimeLabel.style.display = "none";
     firstTimeCheckbox.checked = false;
     sendData = false;
+
+    // Enable settings button
+    toggleBtn.disabled = false;
+    toggleBtn.style.background = "#62f";
   }
 });
 
