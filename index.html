@@ -12,7 +12,6 @@
     margin:0;
     padding:0;
   }
-
   .container {
     display:flex;
     flex-direction:column;
@@ -20,7 +19,6 @@
     align-items:center;
     min-height:100vh;
   }
-
   .box { 
     width:500px;
     padding:20px;
@@ -29,7 +27,6 @@
     margin-bottom:20px;
     position:relative;
   }
-
   #modeToggle {
     position:absolute;
     top:10px;
@@ -43,7 +40,6 @@
     cursor:pointer;
     box-shadow:0 3px 6px rgba(0,0,0,0.3);
   }
-
   #prompt {
     border: 3px solid #62f;
     border-radius: 12px;
@@ -52,7 +48,6 @@
     min-width: 200px;
     margin: 15px 0;
   }
-
   button { 
     margin-top: 12px;
     padding: 12px 20px;
@@ -66,51 +61,14 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     transition: transform 0.1s ease-in-out, background 0.2s;
   }
-
-  button:hover {
-    background: #4a1fff;
-    transform: scale(1.05);
-  }
-
-  #startBtn {
-    padding: 18px 32px;
-    font-size: 22px;
-    margin-bottom: 10px;
-    background: #1fa34a;
-  }
-
-  #startBtn:hover {
-    background: #17853b;
-  }
-
-  #footer {
-    margin-top: 20px;
-    font-size: 14px;
-    opacity: 0.7;
-  }
-
-  #settings label {
-    display:block;
-    margin: 10px 0;
-  }
-
-  #firstTimeLabel {
-    display: none;
-    margin-bottom: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #f39c12;
-  }
-
-  #firstTimeLabel input {
-    margin-right: 8px;
-    transform: scale(1.2);
-    cursor: pointer;
-  }
-
-  .hidden {
-    display: none !important;
-  }
+  button:hover { background: #4a1fff; transform: scale(1.05); }
+  #startBtn { padding: 18px 32px; font-size: 22px; margin-bottom: 10px; background: #1fa34a; }
+  #startBtn:hover { background: #17853b; }
+  #footer { margin-top: 20px; font-size: 14px; opacity: 0.7; }
+  #settings label { display:block; margin: 10px 0; }
+  #firstTimeLabel { display: none; margin-bottom: 15px; font-size: 16px; font-weight: bold; color: #f39c12; }
+  #firstTimeLabel input { margin-right: 8px; transform: scale(1.2); cursor: pointer; }
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -118,7 +76,7 @@
   <div class="box">
     <button id="modeToggle">Mode: Custom</button>
 
-    <!-- First-time checkbox -->
+    <!-- First-time checkbox (only shown in Blind Mode) -->
     <label id="firstTimeLabel">
       <input type="checkbox" id="firstTimeCheckbox"> First time using Blind Mode
     </label>
@@ -139,7 +97,6 @@
       </label>
     </div>
   </div>
-
   <div id="footer">Created by Jon-luke Sadowsky</div>
 </div>
 
@@ -162,179 +119,108 @@ let trial = 0;
 let trialResults = [];
 let sendData = false;
 
-// Listen to checkbox changes
+// Listen to checkbox
 firstTimeCheckbox.addEventListener("change", e => sendData = e.target.checked);
 
 // ===== Custom Mode =====
 function startCustom() {
   const delaySec = Number(delayInput.value);
-  if (isNaN(delaySec) || delaySec <= 0) { 
-    alert("Enter a positive number of seconds."); 
-    return; 
-  }
-
+  if (isNaN(delaySec) || delaySec <= 0) { alert("Enter a positive number of seconds."); return; }
   prompt.textContent = "Wait for it...";
   result.textContent = "";
   startBtn.disabled = true;
   waiting = true;
-
-  setTimeout(() => {
-    prompt.textContent = "GO!";
-    goTime = performance.now();
-  }, delaySec * 1000);
+  setTimeout(() => { prompt.textContent = "GO!"; goTime = performance.now(); }, delaySec * 1000);
 }
 
 // ===== Blind Mode =====
-const blindDelays = [10, 20, 30];
-
+const blindDelays = [10,20,30];
 function startBlind() {
-  if (trial >= blindDelays.length) {
+  if(trial >= blindDelays.length){
     let output = "All Trials Complete:<br>";
-    trialResults.forEach((rt, i) => output += `Trial ${i+1} (${blindDelays[i]}s wait): ${rt} ms<br>`);
+    trialResults.forEach((rt,i)=>output+=`Trial ${i+1} (${blindDelays[i]}s wait): ${rt} ms<br>`);
     prompt.innerHTML = output;
     startBtn.disabled = false;
     startBtn.textContent = "Restart Blind Test";
-
-    if (sendData) {
-      sendResults(trialResults[0], trialResults[1], trialResults[2]);
-    }
-
-    trial = 0;
-    trialResults = [];
+    if(sendData){ sendResults(trialResults[0],trialResults[1],trialResults[2]); }
+    trial=0; trialResults=[];
     return;
   }
-
-  prompt.textContent = `Trial ${trial+1}: Press Start when ready`;
-  result.textContent = "";
-  startBtn.disabled = false;
-  startBtn.textContent = "Start Trial";
+  prompt.textContent=`Trial ${trial+1}: Press Start when ready`;
+  result.textContent="";
+  startBtn.disabled=false;
+  startBtn.textContent="Start Trial";
 }
 
-function runBlindTrial() {
-  const waitSec = blindDelays[trial];
-  prompt.textContent = "Wait for it...";
-  result.textContent = "";
-  startBtn.disabled = true;
-  waiting = true;
-
-  setTimeout(() => {
-    prompt.textContent = "GO!";
-    goTime = performance.now();
-  }, waitSec * 1000);
+function runBlindTrial(){
+  const waitSec=blindDelays[trial];
+  prompt.textContent="Wait for it...";
+  result.textContent="";
+  startBtn.disabled=true;
+  waiting=true;
+  setTimeout(()=>{prompt.textContent="GO!"; goTime=performance.now();}, waitSec*1000);
 }
 
-function finishBlindTrial(rt) {
-  trialResults.push(rt);
-  trial++;
-  setTimeout(() => startBlind(), 1000);
-}
+function finishBlindTrial(rt){ trialResults.push(rt); trial++; setTimeout(()=>startBlind(),1000); }
 
 // ===== Handle Responses =====
-function handleResponse(e) {
-  if (e && e.target === toggleBtn) return;
-  if (e && e.target === modeToggle) return;
-
-  if (!waiting || !goTime) return;
-
-  const rt = Math.round(performance.now() - goTime);
-  waiting = false;
-  goTime = 0;
-  startBtn.disabled = false;
-
-  if (mode === "custom") {
-    prompt.textContent = `Your reaction time: ${rt} ms`;
-  } else {
-    prompt.textContent = `Trial ${trial+1} result: ${rt} ms`;
-    finishBlindTrial(rt);
-  }
+function handleResponse(e){
+  if(e&&(e.target===toggleBtn||e.target===modeToggle)) return;
+  if(!waiting||!goTime) return;
+  const rt=Math.round(performance.now()-goTime);
+  waiting=false; goTime=0; startBtn.disabled=false;
+  if(mode==="custom"){ prompt.textContent=`Your reaction time: ${rt} ms`; }
+  else{ prompt.textContent=`Trial ${trial+1} result: ${rt} ms`; finishBlindTrial(rt); }
 }
 
 // ===== Button Listeners =====
-startBtn.addEventListener("click", () => {
-  if (mode === "custom") startCustom();
-  else {
-    if (!waiting && goTime === 0) {
-      if (startBtn.textContent === "Start Trial") runBlindTrial();
+startBtn.addEventListener("click",()=>{
+  if(mode==="custom") startCustom();
+  else{
+    if(!waiting&&goTime===0){
+      if(startBtn.textContent==="Start Trial") runBlindTrial();
       else startBlind();
     }
   }
 });
 
-document.addEventListener("keydown", e => {
-  if (e.key === " " || e.key === "Enter") {
-    e.preventDefault();
-    handleResponse(e);
-  }
-});
-document.addEventListener("click", handleResponse);
+document.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();handleResponse(e);}});
+document.addEventListener("click",handleResponse);
 
-// Toggle settings visibility
-toggleBtn.addEventListener("click", e => {
+toggleBtn.addEventListener("click",e=>{
   e.stopPropagation();
   settings.classList.toggle("hidden");
   toggleBtn.textContent = settings.classList.contains("hidden") ? "Show Settings" : "Hide Settings";
 });
 
 // ===== Mode Switch =====
-modeToggle.addEventListener("click", () => {
-  if (mode === "custom") {
-    // Switch to Blind Mode
-    mode = "blind";
-    modeToggle.textContent = "Mode: Blind";
-    instructions.textContent = "In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
-
-    trial = 0;
-    trialResults = [];
-    prompt.textContent = "Press Start to Begin Blind Test";
-    result.textContent = "";
-    startBtn.textContent = "Start";
-
-    firstTimeLabel.style.display = "block";
-    firstTimeCheckbox.checked = false;
-    sendData = false;
-
-    // Hide settings panel using the .hidden class
-    settings.classList.add("hidden");
-    toggleBtn.style.display = "none";
-
-  } else {
-    // Switch to Custom Mode
-    mode = "custom";
-    modeToggle.textContent = "Mode: Custom";
-    instructions.textContent = "Click Start, wait for GO!, then click in the box as soon as you see GO!.";
-    prompt.textContent = "Press Start to Begin";
-    result.textContent = "";
-    startBtn.textContent = "Start";
-
-    firstTimeLabel.style.display = "none";
-    firstTimeCheckbox.checked = false;
-    sendData = false;
-
-    // Show toggle button and settings
-    toggleBtn.style.display = "inline-block";
-    settings.classList.remove("hidden");
+modeToggle.addEventListener("click",()=>{
+  if(mode==="custom"){
+    mode="blind"; modeToggle.textContent="Mode: Blind";
+    instructions.textContent="In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
+    trial=0; trialResults=[]; prompt.textContent="Press Start to Begin Blind Test"; result.textContent=""; startBtn.textContent="Start";
+    firstTimeLabel.style.display="block"; firstTimeCheckbox.checked=false; sendData=false;
+    settings.classList.add("hidden"); toggleBtn.style.display="none";
+  } else{
+    mode="custom"; modeToggle.textContent="Mode: Custom";
+    instructions.textContent="Click Start, wait for GO!, then click in the box as soon as you see GO!.";
+    prompt.textContent="Press Start to Begin"; result.textContent=""; startBtn.textContent="Start";
+    firstTimeLabel.style.display="none"; firstTimeCheckbox.checked=false; sendData=false;
+    toggleBtn.style.display="inline-block"; settings.classList.remove("hidden");
   }
 });
 
 // ===== Send Results =====
-function sendResults(trial1, trial2, trial3) {
-  const url = "https://script.google.com/macros/s/AKfycbzjt6xa2PUeKclIVVAVyO_qc4fedHlj5fbkYH4oU7xyKkTDe24hVTif2GPUmTOq4EJxVw/exec"; // your new script URL
-
-  // Generate a simple user identifier
-  let user = localStorage.getItem("reactionTestUser");
-  if (!user) {
-    user = "User-" + Math.floor(Math.random() * 100000);
-    localStorage.setItem("reactionTestUser", user);
-  }
-
-  fetch(url, {
-    method: "POST",
-    body: JSON.stringify({ user, trial1, trial2, trial3 }),
-    headers: { "Content-Type": "application/json" }
+function sendResults(trial1,trial2,trial3){
+  const url="https://script.google.com/macros/s/AKfycbzjt6xa2PUeKclIVVAVyO_qc4fedHlj5fbkYH4oU7xyKkTDe24hVTif2GPUmTOq4EJxVw/exec";
+  fetch(url,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({trial1,trial2,trial3,firstTime:sendData,userId:"anonymous"})
   })
-  .then(res => res.json())
-  .then(res => console.log("Data sent:", res))
-  .catch(err => console.error("Error:", err));
+  .then(()=>console.log("Results sent"))
+  .catch(err=>console.error("Send failed:",err));
 }
 </script>
 </body>
