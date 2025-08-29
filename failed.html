@@ -168,11 +168,6 @@ function startCustom() {
     return; 
   }
 
-  if (!settings.classList.contains("hidden")) {
-    settings.classList.add("hidden");
-    toggleBtn.textContent = "Show Settings";
-  }
-
   prompt.textContent = "Wait for it...";
   result.textContent = "";
   startBtn.disabled = true;
@@ -189,7 +184,6 @@ const blindDelays = [10, 20, 30]; // seconds
 
 function startBlind() {
   if (trial >= blindDelays.length) {
-    // show results
     let output = "All Trials Complete:<br>";
     trialResults.forEach((rt, i) => {
       output += `Trial ${i+1} (${blindDelays[i]}s wait): ${rt} ms<br>`;
@@ -198,7 +192,6 @@ function startBlind() {
     startBtn.disabled = false;
     startBtn.textContent = "Restart Blind Test";
 
-    // only send if checkbox was checked
     if (sendData) {
       sendResults(trialResults[0], trialResults[1], trialResults[2]);
     }
@@ -210,7 +203,6 @@ function startBlind() {
 
   prompt.textContent = `Trial ${trial+1}: Press Start when ready`;
   result.textContent = "";
-
   startBtn.disabled = false;
   startBtn.textContent = "Start Trial";
 }
@@ -295,8 +287,7 @@ modeToggle.addEventListener("click", () => {
     mode = "blind";
     modeToggle.textContent = "Mode: Blind";
     instructions.textContent = "In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
-    settings.classList.add("hidden");
-    toggleBtn.disabled = true;
+
     trial = 0;
     trialResults = [];
     prompt.textContent = "Press Start to Begin Blind Test";
@@ -308,12 +299,14 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
+    // settings toggle remains functional
+    toggleBtn.disabled = false;
+
   } else {
     // switch to Custom
     mode = "custom";
     modeToggle.textContent = "Mode: Custom";
     instructions.textContent = "Click Start, wait for GO!, then click in the box as soon as you see GO!.";
-    toggleBtn.disabled = false;
     startBtn.textContent = "Start";
     prompt.textContent = "Press Start to Begin";
     result.textContent = "";
@@ -322,6 +315,8 @@ modeToggle.addEventListener("click", () => {
     firstTimeLabel.style.display = "none";
     firstTimeCheckbox.checked = false;
     sendData = false;
+
+    toggleBtn.disabled = false;
   }
 });
 
