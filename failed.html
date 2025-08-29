@@ -94,14 +94,27 @@
     opacity: 0.7;
   }
 
-  #settings label, #firstTimeLabel {
+  #settings label {
     display:block;
     margin: 10px 0;
   }
 
   #firstTimeLabel {
     display: none; /* hidden by default */
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #f39c12;
+  }
+
+  #firstTimeLabel input {
+    margin-right: 8px;
+    transform: scale(1.2);
+    cursor: pointer;
+  }
+
+  .hidden {
+    display: none !important;
   }
 </style>
 </head>
@@ -149,7 +162,7 @@ const firstTimeCheckbox = document.getElementById("firstTimeCheckbox");
 
 let goTime = 0;
 let waiting = false;
-let mode = "custom"; // "custom" or "blind"
+let mode = "custom";
 let trial = 0;
 let trialResults = [];
 let sendData = false;
@@ -263,13 +276,8 @@ document.addEventListener("click", handleResponse);
 // Toggle settings visibility
 toggleBtn.addEventListener("click", e => {
   e.stopPropagation();
-  if (settings.classList.contains("hidden")) {
-    settings.classList.remove("hidden");
-    toggleBtn.textContent = "Hide Settings";
-  } else {
-    settings.classList.add("hidden");
-    toggleBtn.textContent = "Show Settings";
-  }
+  settings.classList.toggle("hidden"); // toggle hidden class
+  toggleBtn.textContent = settings.classList.contains("hidden") ? "Show Settings" : "Hide Settings";
 });
 
 // ===== Mode Switch =====
