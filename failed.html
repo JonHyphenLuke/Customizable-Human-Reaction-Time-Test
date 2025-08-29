@@ -80,8 +80,8 @@
   #startBtn {
     padding: 18px 32px;
     font-size: 22px;
-    background: #1fa34a;
     margin-bottom: 10px;
+    background: #1fa34a;
   }
 
   #startBtn:hover {
@@ -99,9 +99,8 @@
     margin: 10px 0;
   }
 
-  /* First-time checkbox hidden by default */
   #firstTimeLabel {
-    display: none;
+    display: none; /* hidden by default */
     margin-bottom: 10px;
   }
 </style>
@@ -153,14 +152,12 @@ let waiting = false;
 let mode = "custom"; // "custom" or "blind"
 let trial = 0;
 let trialResults = [];
-let sendData = false; // only send if first-time checkbox is checked
+let sendData = false;
 
-// ===== Checkbox listener added once =====
-firstTimeCheckbox.addEventListener("change", (e) => {
-  sendData = e.target.checked;
-});
+// Listen to checkbox changes
+firstTimeCheckbox.addEventListener("change", e => sendData = e.target.checked);
 
-// ========== CUSTOM MODE ==========
+// ===== Custom Mode =====
 function startCustom() {
   const delaySec = Number(delayInput.value);
   if (isNaN(delaySec) || delaySec <= 0) { 
@@ -179,15 +176,13 @@ function startCustom() {
   }, delaySec * 1000);
 }
 
-// ========== BLIND MODE ==========
-const blindDelays = [10, 20, 30]; // seconds
+// ===== Blind Mode =====
+const blindDelays = [10, 20, 30];
 
 function startBlind() {
   if (trial >= blindDelays.length) {
     let output = "All Trials Complete:<br>";
-    trialResults.forEach((rt, i) => {
-      output += `Trial ${i+1} (${blindDelays[i]}s wait): ${rt} ms<br>`;
-    });
+    trialResults.forEach((rt, i) => output += `Trial ${i+1} (${blindDelays[i]}s wait): ${rt} ms<br>`);
     prompt.innerHTML = output;
     startBtn.disabled = false;
     startBtn.textContent = "Restart Blind Test";
@@ -226,7 +221,7 @@ function finishBlindTrial(rt) {
   setTimeout(() => startBlind(), 1000);
 }
 
-// ========== RESPONSE HANDLER ==========
+// ===== Handle Responses =====
 function handleResponse(e) {
   if (e && e.target === toggleBtn) return;
   if (e && e.target === modeToggle) return;
@@ -246,30 +241,27 @@ function handleResponse(e) {
   }
 }
 
-// ========== BUTTON LISTENERS ==========
+// ===== Button Listeners =====
 startBtn.addEventListener("click", () => {
-  if (mode === "custom") {
-    startCustom();
-  } else {
+  if (mode === "custom") startCustom();
+  else {
     if (!waiting && goTime === 0) {
-      if (startBtn.textContent === "Start Trial") {
-        runBlindTrial();
-      } else {
-        startBlind();
-      }
+      if (startBtn.textContent === "Start Trial") runBlindTrial();
+      else startBlind();
     }
   }
 });
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === " " || e.key === "Enter") { 
-    e.preventDefault(); 
-    handleResponse(e); 
+document.addEventListener("keydown", e => {
+  if (e.key === " " || e.key === "Enter") {
+    e.preventDefault();
+    handleResponse(e);
   }
 });
 document.addEventListener("click", handleResponse);
 
-toggleBtn.addEventListener("click", (e) => {
+// Toggle settings visibility
+toggleBtn.addEventListener("click", e => {
   e.stopPropagation();
   if (settings.classList.contains("hidden")) {
     settings.classList.remove("hidden");
@@ -280,10 +272,9 @@ toggleBtn.addEventListener("click", (e) => {
   }
 });
 
-// ===== Mode switch =====
+// ===== Mode Switch =====
 modeToggle.addEventListener("click", () => {
   if (mode === "custom") {
-    // switch to Blind
     mode = "blind";
     modeToggle.textContent = "Mode: Blind";
     instructions.textContent = "In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
@@ -294,33 +285,25 @@ modeToggle.addEventListener("click", () => {
     result.textContent = "";
     startBtn.textContent = "Start";
 
-    // show first-time checkbox
     firstTimeLabel.style.display = "block";
     firstTimeCheckbox.checked = false;
     sendData = false;
 
-    // settings toggle remains functional
-    toggleBtn.disabled = false;
-
   } else {
-    // switch to Custom
     mode = "custom";
     modeToggle.textContent = "Mode: Custom";
     instructions.textContent = "Click Start, wait for GO!, then click in the box as soon as you see GO!.";
-    startBtn.textContent = "Start";
     prompt.textContent = "Press Start to Begin";
     result.textContent = "";
+    startBtn.textContent = "Start";
 
-    // hide first-time checkbox
     firstTimeLabel.style.display = "none";
     firstTimeCheckbox.checked = false;
     sendData = false;
-
-    toggleBtn.disabled = false;
   }
 });
 
-// ===== Send results to Google Apps Script =====
+// ===== Send Results =====
 function sendResults(trial1, trial2, trial3) {
   const url = "YOUR_APPS_SCRIPT_URL_HERE"; // replace with your script URL
 
