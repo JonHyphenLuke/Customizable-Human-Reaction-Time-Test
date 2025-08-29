@@ -77,10 +77,6 @@
     cursor: not-allowed;
   }
 
-  .hidden {
-    display: none;
-  }
-
   #startBtn {
     padding: 18px 32px;
     font-size: 22px;
@@ -102,6 +98,12 @@
     display:block;
     margin: 10px 0;
   }
+
+  /* First-time checkbox hidden by default */
+  #firstTimeLabel {
+    display: none;
+    margin-bottom: 10px;
+  }
 </style>
 </head>
 <body>
@@ -109,8 +111,8 @@
   <div class="box">
     <button id="modeToggle">Mode: Custom</button>
 
-    <!-- First-time checkbox, hidden by default -->
-    <label id="firstTimeLabel" class="hidden">
+    <!-- First-time checkbox -->
+    <label id="firstTimeLabel">
       <input type="checkbox" id="firstTimeCheckbox"> First time using Blind Mode
     </label>
 
@@ -152,11 +154,6 @@ let mode = "custom"; // "custom" or "blind"
 let trial = 0;
 let trialResults = [];
 let sendData = false; // only send if first-time checkbox is checked
-
-// ===== Hide checkbox on page load =====
-firstTimeLabel.classList.add("hidden");
-firstTimeCheckbox.checked = false;
-sendData = false;
 
 // ===== Checkbox listener added once =====
 firstTimeCheckbox.addEventListener("change", (e) => {
@@ -291,7 +288,7 @@ toggleBtn.addEventListener("click", (e) => {
   }
 });
 
-// Mode switch
+// ===== Mode switch =====
 modeToggle.addEventListener("click", () => {
   if (mode === "custom") {
     // switch to Blind
@@ -306,8 +303,8 @@ modeToggle.addEventListener("click", () => {
     result.textContent = "";
     startBtn.textContent = "Start";
 
-    // show the first-time checkbox
-    firstTimeLabel.classList.remove("hidden");
+    // show first-time checkbox
+    firstTimeLabel.style.display = "block";
     firstTimeCheckbox.checked = false;
     sendData = false;
 
@@ -321,8 +318,8 @@ modeToggle.addEventListener("click", () => {
     prompt.textContent = "Press Start to Begin";
     result.textContent = "";
 
-    // hide the checkbox in custom mode
-    firstTimeLabel.classList.add("hidden");
+    // hide first-time checkbox
+    firstTimeLabel.style.display = "none";
     firstTimeCheckbox.checked = false;
     sendData = false;
   }
