@@ -318,11 +318,18 @@ modeToggle.addEventListener("click", () => {
 
 // ===== Send Results =====
 function sendResults(trial1, trial2, trial3) {
-  const url = "https://script.google.com/macros/s/AKfycbz2gdd1WZG8RxwZes7ZfSgAmttLaYwo4unNqFlgaeEyfrvKzb9SY_Nb9OJJelGzOpyW-Q/exec"; // replace with your script URL
+  const url = "https://script.google.com/macros/s/AKfycbxLpZVP1bJXYfUJ5myWN6yBZYE9rm1p0yzw4lPCRk-6D0XDBdd64i1uuSRnjpgV87GP/exec"; // your new script URL
+
+  // Generate a simple user identifier
+  let user = localStorage.getItem("reactionTestUser");
+  if (!user) {
+    user = "User-" + Math.floor(Math.random() * 100000);
+    localStorage.setItem("reactionTestUser", user);
+  }
 
   fetch(url, {
     method: "POST",
-    body: JSON.stringify({ trial1, trial2, trial3 }),
+    body: JSON.stringify({ user, trial1, trial2, trial3 }),
     headers: { "Content-Type": "application/json" }
   })
   .then(res => res.json())
