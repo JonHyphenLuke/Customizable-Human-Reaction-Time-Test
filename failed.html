@@ -278,6 +278,7 @@ toggleBtn.addEventListener("click", e => {
 // ===== Mode Switch =====
 modeToggle.addEventListener("click", () => {
   if (mode === "custom") {
+    // Switch to Blind Mode
     mode = "blind";
     modeToggle.textContent = "Mode: Blind";
     instructions.textContent = "In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
@@ -297,6 +298,7 @@ modeToggle.addEventListener("click", () => {
     toggleBtn.style.display = "none";
 
   } else {
+    // Switch to Custom Mode
     mode = "custom";
     modeToggle.textContent = "Mode: Custom";
     instructions.textContent = "Click Start, wait for GO!, then click in the box as soon as you see GO!.";
@@ -308,9 +310,8 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
-    // Restore toggle button visibility
+    // Show toggle button and settings
     toggleBtn.style.display = "inline-block";
-    // Make sure settings is visible again
     settings.classList.remove("hidden");
   }
 });
