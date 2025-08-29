@@ -107,6 +107,10 @@
     transform: scale(1.2);
     cursor: pointer;
   }
+
+  .hidden {
+    display: none !important;
+  }
 </style>
 </head>
 <body>
@@ -288,9 +292,9 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
-    // Hide both settings panel and toggle button completely
+    // Hide settings panel using the .hidden class
+    settings.classList.add("hidden");
     toggleBtn.style.display = "none";
-    settings.style.display = "none";
 
   } else {
     mode = "custom";
@@ -304,9 +308,10 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
-    // Restore settings and toggle button
+    // Restore toggle button visibility
     toggleBtn.style.display = "inline-block";
-    settings.style.display = "block";
+    // Make sure settings is visible again
+    settings.classList.remove("hidden");
   }
 });
 
