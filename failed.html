@@ -276,7 +276,7 @@ document.addEventListener("click", handleResponse);
 // Toggle settings visibility
 toggleBtn.addEventListener("click", e => {
   e.stopPropagation();
-  settings.classList.toggle("hidden"); // toggle hidden class
+  settings.classList.toggle("hidden");
   toggleBtn.textContent = settings.classList.contains("hidden") ? "Show Settings" : "Hide Settings";
 });
 
