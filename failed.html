@@ -95,7 +95,7 @@
   }
 
   #firstTimeLabel {
-    display: none; /* hidden by default */
+    display: none;
     margin-bottom: 15px;
     font-size: 16px;
     font-weight: bold;
@@ -106,10 +106,6 @@
     margin-right: 8px;
     transform: scale(1.2);
     cursor: pointer;
-  }
-
-  .hidden {
-    display: none !important;
   }
 </style>
 </head>
@@ -292,9 +288,9 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
-    // Hide both settings section and toggle button
+    // Hide both settings panel and toggle button completely
     toggleBtn.style.display = "none";
-    settings.classList.add("hidden");
+    settings.style.display = "none";
 
   } else {
     mode = "custom";
@@ -308,9 +304,9 @@ modeToggle.addEventListener("click", () => {
     firstTimeCheckbox.checked = false;
     sendData = false;
 
-    // Show settings section and toggle button in Custom Mode
+    // Restore settings and toggle button
     toggleBtn.style.display = "inline-block";
-    settings.classList.remove("hidden");
+    settings.style.display = "block";
   }
 });
 
