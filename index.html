@@ -197,7 +197,7 @@ toggleBtn.addEventListener("click",e=>{
 modeToggle.addEventListener("click",()=>{
   if(mode==="custom"){
     mode="blind"; modeToggle.textContent="Mode: Blind";
-    instructions.textContent="In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.";
+    instructions.textContent="In Blind Mode you will complete 3 trials with hidden wait times. Press Start to begin each trial.Remember to click inside of the purple box!";
     trial=0; trialResults=[]; prompt.textContent="Press Start to Begin Blind Test"; result.textContent=""; startBtn.textContent="Start";
     firstTimeLabel.style.display="block"; firstTimeCheckbox.checked=false; sendData=false;
     settings.classList.add("hidden"); toggleBtn.style.display="none";
