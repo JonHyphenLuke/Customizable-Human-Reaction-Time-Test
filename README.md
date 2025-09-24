@@ -8,3 +8,5 @@ This project has a custumizable "Human Reaction time Benchmark test" where you c
 
 click on this to run the test
 https://jonhyphenluke.github.io/Customizable-Human-Reaction-Time-Test
+
+if have anyquestions put in a issue or a comment and ill try to respond back to you, u can also send me an email at sadowskyjonluke@gmail.com if u want
